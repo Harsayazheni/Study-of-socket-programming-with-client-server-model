@@ -39,43 +39,49 @@ PROGRAM:
 
 CLIENT:
 
+```
 import socket
 
-s=socket.socket()
-
-s.bind(('localhost',8000))
-
+s = socket.socket()
+s.bind(('localhost', 8000))
 s.listen(5)
 
-c,addr=s.accept()
+c, addr = s.accept()
 
-address={"165.165.80.80":"6A:08:AA:C2","165.165.79.1":"8A:BC:E3:FA"};
+address = {
+    "165.165.80.80": "6A:08:AA:C2",
+    "165.165.79.1": "8A:BC:E3:FA"
+}
 
 while True:
+    ip = c.recv(1024).decode().strip()
+    if not ip:
+        break
+    try:
+        c.send(address[ip].encode())
+    except KeyError:
+        c.send("Not Found".encode())
 
-ip=c.recv(1024).decode()
-
-try:
-
-c.send(address[ip].encode())
-
-except KeyError:
-
-c.send("Not Found".encode())
+c.close()
+s.close()
+```
 
 SERVER:
 
+```
 import socket
 
-s=socket.socket()
-
-s.connect(('localhost',8000))
+s = socket.socket()
+s.connect(('localhost', 8000))
 
 print(s.getsockname())
 
+s.send("165.165.80.80".encode())
 print(s.recv(1024).decode())
 
 s.send("acknowledgement recived from the server".encode())
+s.close()
+```
 
 OUTPUT:
 
